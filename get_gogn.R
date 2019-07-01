@@ -100,3 +100,43 @@ df$man_argerd[is.na(df$man_argerd)] <- 6
 
 df <- df %>%
         filter(man_argerd <= 12)
+
+
+df <- df %>%
+        mutate(argerd = make_date(year = ar_argerd,
+                                  month = man_argerd,
+                                  day = 01)) %>%
+        select(-ar_argerd, -man_argerd) %>%
+        na.omit()
+
+
+# Laga upplýsingar um aflgjafa
+
+df$aflgjafi <- str_trim(df$aflgjafi)
+
+df <- df %>%
+        mutate(aflgjafi = case_when(aflgjafi == "Bensín/Bensín" ~ "Bensín",
+                                    aflgjafi == "Metan/Bensín" ~ "Bensín/Metan",
+                                    aflgjafi == "Dísel/Dísel" ~ "Dísel",
+                                    aflgjafi == "Rafmagn/Bensín" ~ "Bensín/Rafmagn",
+                                    TRUE ~ aflgjafi))
+
+df <- df %>%
+        filter(!(aflgjafi == "Dísel/Bensín"))
+
+
+df$skipting <- str_trim(df$skipting)
+
+
+# Bý til aldur bíls
+
+dags <- today()
+
+df <- df %>%
+        mutate(aldur = time_length(difftime(dags, argerd), "years")) %>%
+        filter(aldur < 100)
+
+
+
+write_csv(df, "bilasolur.csv")
+
