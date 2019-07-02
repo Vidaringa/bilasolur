@@ -136,7 +136,5 @@ df <- df %>%
         mutate(aldur = time_length(difftime(dags, argerd), "years")) %>%
         filter(aldur < 100)
 
-
-
 write_csv(df, "bilasolur.csv")
 
